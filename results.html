@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recipe Results</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #E8F5E9 0%, #FFF8E1 100%);
+      background-size: 200% 200%;
+      animation: backgroundShift 15s ease infinite;
+      margin: 0;
+      padding: 20px;
+      color: #333333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #43A047;
+      margin-bottom: 20px;
+    }
+    #recipesGrid {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      max-width: 1000px;
+      width: 95%;
+    }
+    .recipe-card {
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(224, 224, 224, 0.5);
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px solid transparent;
+    }
+    .recipe-card:hover, .recipe-card:focus-within {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 12px 24px rgba(67, 160, 71, 0.3);
+      border-color: #43A047;
+      outline: none;
+    }
+    .recipe-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      transition: all 0.4s ease;
+      filter: brightness(1);
+    }
+    .recipe-card:hover img {
+      transform: scale(1.1);
+      filter: brightness(1.05);
+    }
+    .recipe-content {
+      padding: 18px 20px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .recipe-title {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #333333;
+      margin-bottom: 8px;
+      user-select: text;
+      transition: color 0.3s ease;
+    }
+    .recipe-card:hover .recipe-title {
+      color: #43A047;
+    }
+    .ingredient-counts {
+      font-size: 0.9em;
+      margin-top: auto;
+      color: #666666;
+    }
+    #messageArea {
+      font-size: 1.1em;
+      color: #333333;
+      margin: 20px 0;
+      user-select: none;
+      text-align: center;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9em;
+      margin-top: auto;
+      background: #43A047;
+      user-select: none;
+      width: 100%;
+    }
+
+    @keyframes backgroundShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @media (max-width: 480px) {
+      #recipesGrid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Recipe Results</h1>
+  <div id="messageArea" role="status" aria-live="polite"></div>
+  <div id="recipesGrid" aria-live="polite" aria-relevant="additions removals"></div>
+
+  <footer>© 2025 Interactive Recipe Finder. All rights reserved.</footer>
+
+  <script>
+    const apiKey = '6fe805f276d844ec856949d159c69875'; 
+    const recipesGrid = document.getElementById('recipesGrid');
+    const messageArea = document.getElementById('messageArea');
+
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    async function fetchRecipes(ingredients) {
+      const url = `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${encodeURIComponent(ingredients)}&number=12&apiKey=${apiKey}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to load recipes. Please check your API key or try again later.');
+        }
+        return await response.json();
+      } catch (error) {
+        showMessage(error.message, true);
+        return [];
+      }
+    }
+
+    function showMessage(msg, isError = false) {
+      messageArea.textContent = msg;
+      messageArea.style.color = isError ? '#FF7043' : '#333333';
+    }
+
+    function clearMessage() {
+      messageArea.textContent = '';
+    }
+
+    function renderRecipes(recipes) {
+      recipesGrid.innerHTML = '';
+      if (recipes.length === 0) {
+        showMessage('No recipes found for the given ingredients.');
+        return;
+      }
+      clearMessage();
+      recipes.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'recipe-card';
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-pressed', 'false');
+        card.innerHTML = `
+          <img src="${r.image}" alt="${r.title}" />
+          <div class="recipe-content">
+            <div class="recipe-title">${r.title}</div>
+            <div class="ingredient-counts">Matched: ${r.usedIngredientCount}, Missing: ${r.missedIngredientCount}</div>
+          </div>
+        `;
+        card.addEventListener('click', () => {
+          window.location.href = `recipe.html?id=${r.id}`;
+        });
+        card.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            window.location.href = `recipe.html?id=${r.id}`;
+          }
+        });
+        recipesGrid.appendChild(card);
+      });
+    }
+
+    async function init() {
+      const ingredients = getQueryParam('ingredients');
+      if (!ingredients) {
+        showMessage('No ingredients specified.');
+        return;
+      }
+      showMessage('Loading recipes...');
+      const recipes = await fetchRecipes(ingredients);
+      renderRecipes(recipes);
+    }
+
+    init();
+  </script>
+</body>
+</html>

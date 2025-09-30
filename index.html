@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Recipe Finder</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+  /* Background animation */
+  @keyframes backgroundShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  body {
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #E8F5E9 0%, #FFF8E1 100%);
+    background-size: 200% 200%;
+    animation: backgroundShift 15s ease infinite;
+    margin: 0;
+    padding: 0;
+    color: #333333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  nav {
+    background: #FFFFFF;
+    padding: 15px 30px;
+    color: #333333;
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: 1.5px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(224, 224, 224, 0.5);
+    transition: all 0.3s ease;
+  }
+  nav:hover {
+    box-shadow: 0 4px 12px rgba(224, 224, 224, 0.7);
+  }
+  #searchBar {
+    padding: 12px 20px;
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(224, 224, 224, 0.3);
+  }
+  #searchInput {
+    font-size: 1.1em;
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: 2px solid #C8E6C9;
+    max-width: 450px;
+    width: 100%;
+    background: #FFFFFF;
+    color: #333333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+  #searchInput::placeholder {
+    color: #888888;
+  }
+  #searchInput:focus {
+    outline: none;
+    border-color: #43A047;
+    box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  #searchInput:hover {
+    border-color: #43A047;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  #messageArea {
+    text-align: center;
+    font-size: 1.1em;
+    color: #333333;
+    margin: 10px 0 0 0;
+    min-height: 24px;
+    user-select: none;
+  }
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9em;
+    margin-top: auto;
+    background: #43A047;
+    user-select: none;
+  }
+
+  @media (max-width: 480px) {
+    nav {
+      font-size: 1.3rem;
+      padding: 10px 15px;
+    }
+    #searchBar {
+      padding: 10px 15px;
+    }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <span>Recipe Finder</span>
+</nav>
+<div id="searchBar">
+  <input type="text" id="searchInput" placeholder="Enter ingredients..." aria-label="Search recipes" autocomplete="off" />
+</div>
+<div id="messageArea" role="status" aria-live="polite"></div>
+
+<footer>© 2025 Interactive Recipe Finder. All rights reserved.</footer>
+
+<script>
+const searchInput = document.getElementById('searchInput');
+const messageArea = document.getElementById('messageArea');
+
+// Show message in message area
+function showMessage(msg, isError = false) {
+  messageArea.textContent = msg;
+  messageArea.style.color = isError ? '#FF7043' : '#333333';
+}
+
+// Clear message area
+function clearMessage() {
+  messageArea.textContent = '';
+}
+
+// Search function: redirect to results page
+function search() {
+  const query = searchInput.value.trim();
+  if (!query) {
+    showMessage('Please enter some ingredients to search.', true);
+    return;
+  }
+  clearMessage();
+  // Redirect to results page with query param
+  window.location.href = `results.html?ingredients=${encodeURIComponent(query)}`;
+}
+
+// Search on enter key
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    search();
+  }
+});
+</script>
+</body>
+</html>

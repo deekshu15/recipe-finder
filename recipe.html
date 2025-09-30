@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recipe Details</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+    /* Background animation */
+    @keyframes backgroundShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    body {
+      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #E8F5E9 0%, #FFF8E1 100%);
+      background-size: 200% 200%;
+      animation: backgroundShift 15s ease infinite;
+      margin: 0;
+      padding: 20px;
+      color: #333333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #container {
+      background: #FFFFFF;
+      border-radius: 20px;
+      max-width: 800px;
+      width: 100%;
+      padding: 30px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      box-sizing: border-box;
+      position: relative;
+      flex-grow: 1;
+    }
+
+    #image {
+      width: 100%;
+      max-width: 360px;
+      border-radius: 16px;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(224, 224, 224, 0.5);
+      transition: transform 0.3s ease;
+      cursor: default;
+    }
+    #image:hover {
+      transform: scale(1.02);
+    }
+
+    #info {
+      flex: 1 1 320px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #title {
+      margin-top: 0;
+      color: #43A047;
+      font-size: 2rem;
+      user-select: text;
+    }
+
+    #author {
+      font-style: italic;
+      margin-bottom: 20px;
+      color: #666666;
+      user-select: text;
+    }
+
+    #info p {
+      margin: 8px 0;
+      font-size: 1.1em;
+      color: #333333;
+      user-select: text;
+    }
+
+    h2 {
+      color: #43A047;
+      margin-top: 20px;
+      margin-bottom: 12px;
+    }
+
+    ul {
+      margin-top: 20px;
+      padding-left: 24px;
+      font-size: 1em;
+      color: #333333;
+      line-height: 1.6;
+      user-select: text;
+    }
+
+    ul li {
+      margin-bottom: 8px;
+      transition: transform 0.2s ease;
+      cursor: default;
+    }
+
+    ul li:hover {
+      transform: translateX(5px);
+      color: #43A047;
+    }
+
+    #messageArea {
+      font-size: 1.1em;
+      color: #333333;
+      margin: 20px 0;
+      user-select: none;
+      text-align: center;
+      width: 100%;
+    }
+
+    a.back-link {
+      margin-top: 30px;
+      color: #43A047;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 1.1em;
+      align-self: flex-start;
+      border: 2px solid #43A047;
+      padding: 10px 24px;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(67, 160, 71, 0.3);
+      display: inline-block;
+      user-select: none;
+    }
+    a.back-link:hover, a.back-link:focus-visible {
+      background: #FF7043;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(255, 112, 67, 0.5);
+      outline: none;
+    }
+    a.back-link:focus-visible {
+      outline: 3px solid #43A047;
+      outline-offset: 2px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9em;
+      margin-top: auto;
+      background: #43A047;
+      user-select: none;
+      width: 100%;
+    }
+
+    @media (max-width: 480px) {
+      #container {
+        flex-direction: column;
+        padding: 20px;
+      }
+      #image {
+        max-width: 100%;
+        height: auto;
+      }
+      #info {
+        flex: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="messageArea" role="status" aria-live="polite"></div>
+  <div id="container" hidden>
+    <img id="image" alt="Recipe image" />
+    <div id="info">
+      <h1 id="title">Loading...</h1>
+      <p id="author"></p>
+      <p><strong>Servings:</strong> <span id="servings"></span></p>
+      <p><strong>Ready in:</strong> <span id="readyIn"></span> mins</p>
+      <h2>Ingredients</h2>
+           <ul id="ingredients"></ul>
+      <a href="results.html" class="back-link" aria-label="Back to results">← Back to Results</a>
+    </div>
+  </div>
+
+  <footer>© 2025 Interactive Recipe Finder. All rights reserved.</footer>
+
+  <script>
+    const apiKey = '6fe805f276d844ec856949d159c69875'; 
+
+    const messageArea = document.getElementById('messageArea');
+    const container = document.getElementById('container');
+    const titleElem = document.getElementById('title');
+    const imageElem = document.getElementById('image');
+    const authorElem = document.getElementById('author');
+    const servingsElem = document.getElementById('servings');
+    const readyInElem = document.getElementById('readyIn');
+    const ingredientsList = document.getElementById('ingredients');
+
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    function showMessage(msg, isError = false) {
+      messageArea.textContent = msg;
+      messageArea.style.color = isError ? '#FF7043' : '#333333';
+      container.hidden = true;
+    }
+
+    function clearMessage() {
+      messageArea.textContent = '';
+      container.hidden = false;
+    }
+
+    async function fetchRecipeDetails(id) {
+      const url = `https://api.spoonacular.com/recipes/${id}/information?apiKey=${apiKey}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to load recipe details. Please check your API key or try again later.');
+        }
+        return await response.json();
+      } catch (error) {
+        showMessage(error.message, true);
+        return null;
+      }
+    }
+
+    async function init() {
+      const id = getQueryParam('id');
+      if (!id) {
+        showMessage('No recipe ID specified.', true);
+        return;
+      }
+      showMessage('Loading recipe details...');
+      const detail = await fetchRecipeDetails(id);
+      if (!detail) return;
+
+      clearMessage();
+
+      titleElem.textContent = detail.title;
+      imageElem.src = detail.image;
+      imageElem.alt = detail.title;
+      authorElem.textContent = `Source: ${detail.sourceName || 'Unknown'}`;
+      servingsElem.textContent = detail.servings;
+      readyInElem.textContent = detail.readyInMinutes;
+      ingredientsList.innerHTML = detail.extendedIngredients
+        .map(ing => `<li>${ing.original}</li>`)
+        .join('');
+    }
+
+    init();
+  </script>
+</body>
+</html>
