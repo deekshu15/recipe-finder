@@ -5,147 +5,781 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Recipe Finder</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
-  /* Background animation */
-  @keyframes backgroundShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
+:root {
+  --primary: #43A047;
+  --primary-dark: #2e7d32;
+  --secondary: #FF7043;
+  --secondary-dark: #D84315;
+  --bg-light: #E8F5E9;
+  --bg-cream: #FFF8E1;
+  --text: #333333;
+  --white: #FFFFFF;
+  --error: #FF7043;
+  --shadow: rgba(224, 224, 224, 0.5);
+}
 
-  body {
-    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #E8F5E9 0%, #FFF8E1 100%);
-    background-size: 200% 200%;
-    animation: backgroundShift 15s ease infinite;
-    margin: 0;
-    padding: 0;
-    color: #333333;
-    display: flex;
+[data-theme="dark"] {
+  --bg-light: #1a1a1a;
+  --bg-cream: #2d2d2d;
+  --text: #e0e0e0;
+  --white: #2d2d2d;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@keyframes backgroundShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-cream) 100%);
+  background-size: 200% 200%;
+  animation: backgroundShift 15s ease infinite;
+  margin: 0;
+  padding: 0;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Navbar */
+nav {
+  background: var(--white);
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: background 0.3s;
+}
+
+nav .logo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--primary);
+  cursor: pointer;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+nav ul li {
+  display: inline-block;
+}
+
+nav ul li a, nav ul li button {
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+nav ul li a:hover, nav ul li button:hover {
+  color: var(--primary);
+}
+
+.theme-toggle {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s;
+}
+
+.theme-toggle:hover {
+  background: var(--primary-dark);
+  transform: rotate(20deg);
+}
+
+/* Mobile menu */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+}
+.menu-toggle span {
+  width: 25px;
+  height: 3px;
+  background: var(--text);
+  margin: 4px 0;
+  transition: 0.3s;
+}
+@media (max-width: 768px) {
+  nav ul {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: var(--white);
     flex-direction: column;
-    min-height: 100vh;
+    width: 200px;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: none;
   }
-  nav {
-    background: #FFFFFF;
-    padding: 15px 30px;
-    color: #333333;
-    font-weight: 700;
-    font-size: 1.8rem;
-    letter-spacing: 1.5px;
-    text-align: center;
-    position: relative;
-    box-shadow: 0 2px 8px rgba(224, 224, 224, 0.5);
-    transition: all 0.3s ease;
-  }
-  nav:hover {
-    box-shadow: 0 4px 12px rgba(224, 224, 224, 0.7);
-  }
-  #searchBar {
-    padding: 12px 20px;
-    margin-top: 40px;
+  nav ul.show {
     display: flex;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(224, 224, 224, 0.3);
   }
-  #searchInput {
-    font-size: 1.1em;
-    padding: 12px 20px;
-    border-radius: 30px;
-    border: 2px solid #C8E6C9;
-    max-width: 450px;
-    width: 100%;
-    background: #FFFFFF;
-    color: #333333;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
+  .menu-toggle {
+    display: flex;
   }
-  #searchInput::placeholder {
-    color: #888888;
-  }
-  #searchInput:focus {
-    outline: none;
-    border-color: #43A047;
-    box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-  }
-  #searchInput:hover {
-    border-color: #43A047;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-  #messageArea {
-    text-align: center;
-    font-size: 1.1em;
-    color: #333333;
-    margin: 10px 0 0 0;
-    min-height: 24px;
-    user-select: none;
-  }
-  footer {
-    text-align: center;
-    padding: 20px;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9em;
-    margin-top: auto;
-    background: #43A047;
-    user-select: none;
-  }
+}
 
-  @media (max-width: 480px) {
-    nav {
-      font-size: 1.3rem;
-      padding: 10px 15px;
-    }
-    #searchBar {
-      padding: 10px 15px;
-    }
+/* Hero Section */
+.hero {
+  text-align: center;
+  padding: 40px 20px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: var(--primary);
+}
+
+.hero p {
+  font-size: 1.1rem;
+  color: var(--text);
+  opacity: 0.8;
+}
+
+/* Search Bar */
+#searchBar {
+  padding: 20px 20px 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+#searchInput {
+  font-size: 1.1em;
+  padding: 12px 20px;
+  border-radius: 30px;
+  border: 2px solid #C8E6C9;
+  flex: 1;
+  min-width: 250px;
+  background: var(--white);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+#searchInput::placeholder { color: #888888; }
+#searchInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+#searchBtn {
+  padding: 12px 25px;
+  border-radius: 30px;
+  border: none;
+  background-color: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+#searchBtn:hover { 
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* Filters Section */
+.filters-section {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 0 20px;
+}
+
+.filters-toggle {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.filters-toggle button {
+  background: var(--white);
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.filters-toggle button:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.filters-container {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px var(--shadow);
+  display: none;
+}
+
+.filters-container.show {
+  display: block;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-group {
+  margin-bottom: 20px;
+}
+
+.filter-group h3 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  color: var(--primary);
+}
+
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filter-chip {
+  background: var(--bg-light);
+  border: 2px solid transparent;
+  padding: 6px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+}
+
+.filter-chip:hover {
+  border-color: var(--primary);
+}
+
+.filter-chip.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Recent searches */
+#recentSearches {
+  text-align: center;
+  margin: 15px 0;
+  padding: 0 20px;
+}
+
+#recentSearches h3 {
+  font-size: 0.9rem;
+  color: var(--text);
+  opacity: 0.7;
+  margin-bottom: 10px;
+}
+
+#recentSearches .searches-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+#recentSearches span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--white);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+#recentSearches span:hover { 
+  background-color: var(--primary); 
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow);
+}
+
+#recentSearches .delete-search {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+#recentSearches span:hover .delete-search {
+  opacity: 1;
+}
+
+/* Quick Actions */
+.quick-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+  padding: 0 20px;
+}
+
+.quick-actions button {
+  padding: 10px 20px;
+  border-radius: 25px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.btn-favorites {
+  background-color: var(--secondary);
+  color: #fff;
+}
+
+.btn-favorites:hover { 
+  background-color: var(--secondary-dark);
+  transform: translateY(-2px);
+}
+
+.btn-random {
+  background-color: var(--primary);
+  color: #fff;
+}
+
+.btn-random:hover { 
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* Message & spinner */
+#messageArea {
+  text-align: center;
+  font-size: 1.1em;
+  color: var(--text);
+  margin: 10px 0;
+  min-height: 24px;
+}
+#spinner {
+  display: none;
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid var(--primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+@keyframes spin { 
+  0% { transform: rotate(0deg); } 
+  100% { transform: rotate(360deg); } 
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--white);
+  color: var(--text);
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: none;
+  z-index: 2000;
+  animation: slideIn 0.3s ease;
+}
+
+.toast.show {
+  display: block;
+}
+
+.toast.error {
+  background: var(--secondary);
+  color: white;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9em;
+  margin-top: auto;
+  background: var(--primary);
+}
+
+@media (max-width: 600px) {
+  .hero h1 {
+    font-size: 2rem;
+  }
+  
+  #searchBar {
+    flex-direction: column;
+  }
+  
+  #searchInput {
+    width: 100%;
+  }
+  
+  .toast {
+    right: 10px;
+    left: 10px;
+    bottom: 10px;
+  }
+}
 </style>
 </head>
 <body>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast"></div>
+
+<!-- Navbar -->
 <nav>
-  <span>Recipe Finder</span>
+  <div class="logo" onclick="window.location.href='index.html'">Recipe Finder</div>
+  <div class="menu-toggle" id="menuToggle">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <ul id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="favorites.html">♥ Favorites</a></li>
+    <li><button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button></li>
+  </ul>
 </nav>
-<div id="searchBar">
-  <input type="text" id="searchInput" placeholder="Enter ingredients..." aria-label="Search recipes" autocomplete="off" />
+
+<!-- Hero Section -->
+<div class="hero">
+  <h1>Find Your Perfect Recipe</h1>
+  <p>Search thousands of recipes by ingredients you have</p>
 </div>
+
+<!-- Search -->
+<div id="searchBar">
+  <input type="text" id="searchInput" placeholder="Enter ingredients (e.g., chicken, tomato, pasta)..." aria-label="Search recipes" autocomplete="off" />
+  <button id="searchBtn">Search</button>
+</div>
+
+<!-- Filters Section -->
+<div class="filters-section">
+  <div class="filters-toggle">
+    <button id="toggleFilters">🔍 Advanced Filters</button>
+  </div>
+  <div class="filters-container" id="filtersContainer">
+    <div class="filter-group">
+      <h3>Diet</h3>
+      <div class="filter-options" id="dietFilters">
+        <div class="filter-chip" data-filter="diet" data-value="vegetarian">Vegetarian</div>
+        <div class="filter-chip" data-filter="diet" data-value="vegan">Vegan</div>
+        <div class="filter-chip" data-filter="diet" data-value="glutenFree">Gluten Free</div>
+        <div class="filter-chip" data-filter="diet" data-value="ketogenic">Keto</div>
+        <div class="filter-chip" data-filter="diet" data-value="paleo">Paleo</div>
+      </div>
+    </div>
+    <div class="filter-group">
+      <h3>Cuisine</h3>
+      <div class="filter-options" id="cuisineFilters">
+        <div class="filter-chip" data-filter="cuisine" data-value="italian">Italian</div>
+        <div class="filter-chip" data-filter="cuisine" data-value="mexican">Mexican</div>
+        <div class="filter-chip" data-filter="cuisine" data-value="asian">Asian</div>
+        <div class="filter-chip" data-filter="cuisine" data-value="american">American</div>
+        <div class="filter-chip" data-filter="cuisine" data-value="mediterranean">Mediterranean</div>
+        <div class="filter-chip" data-filter="cuisine" data-value="indian">Indian</div>
+      </div>
+    </div>
+    <div class="filter-group">
+      <h3>Sort By</h3>
+      <div class="filter-options" id="sortFilters">
+        <div class="filter-chip active" data-filter="sort" data-value="popularity">Popularity</div>
+        <div class="filter-chip" data-filter="sort" data-value="time">Cooking Time</div>
+        <div class="filter-chip" data-filter="sort" data-value="healthiness">Healthiness</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Searches -->
+<div id="recentSearches"></div>
+
+<!-- Quick Actions -->
+<div class="quick-actions">
+  <button class="btn-favorites" id="viewFavoritesBtn">♥ View Favorites</button>
+  <button class="btn-random" id="randomRecipeBtn">🎲 I'm Feeling Lucky</button>
+</div>
+
+<div id="spinner"></div>
 <div id="messageArea" role="status" aria-live="polite"></div>
 
 <footer>© 2025 Interactive Recipe Finder. All rights reserved.</footer>
 
 <script>
 const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
 const messageArea = document.getElementById('messageArea');
+const spinner = document.getElementById('spinner');
+const recentSearchesDiv = document.getElementById('recentSearches');
+const viewFavoritesBtn = document.getElementById('viewFavoritesBtn');
+const randomRecipeBtn = document.getElementById('randomRecipeBtn');
+const themeToggle = document.getElementById('themeToggle');
+const toggleFiltersBtn = document.getElementById('toggleFilters');
+const filtersContainer = document.getElementById('filtersContainer');
+const toast = document.getElementById('toast');
 
-// Show message in message area
+// State
+let activeFilters = {
+  diet: null,
+  cuisine: null,
+  sort: 'popularity'
+};
+
+// Theme Management
+function initTheme() {
+  const savedTheme = getFromMemory('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+}
+
+themeToggle.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  saveToMemory('theme', newTheme);
+  themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+  showToast(`${newTheme === 'dark' ? 'Dark' : 'Light'} mode activated`);
+});
+
+// Memory Storage Functions
+function saveToMemory(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    console.warn('Storage not available');
+  }
+}
+
+function getFromMemory(key) {
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Toast Notification
+function showToast(msg, isError = false) {
+  toast.textContent = msg;
+  toast.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+// Navbar toggle
+const menuToggle = document.getElementById('menuToggle');
+const navLinks = document.getElementById('navLinks');
+menuToggle.addEventListener('click', () => {
+  navLinks.classList.toggle('show');
+});
+
+// Filters Toggle
+toggleFiltersBtn.addEventListener('click', () => {
+  filtersContainer.classList.toggle('show');
+});
+
+// Filter Chips
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const filterType = chip.dataset.filter;
+    const filterValue = chip.dataset.value;
+    
+    if (filterType === 'sort') {
+      document.querySelectorAll(`[data-filter="sort"]`).forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeFilters.sort = filterValue;
+    } else {
+      if (chip.classList.contains('active')) {
+        chip.classList.remove('active');
+        activeFilters[filterType] = null;
+      } else {
+        document.querySelectorAll(`[data-filter="${filterType}"]`).forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        activeFilters[filterType] = filterValue;
+      }
+    }
+  });
+});
+
 function showMessage(msg, isError = false) {
   messageArea.textContent = msg;
-  messageArea.style.color = isError ? '#FF7043' : '#333333';
+  messageArea.style.color = isError ? 'var(--error)' : 'var(--text)';
 }
 
-// Clear message area
-function clearMessage() {
-  messageArea.textContent = '';
+function clearMessage() { 
+  messageArea.textContent = ''; 
 }
 
-// Search function: redirect to results page
+function showSpinner(show) { 
+  spinner.style.display = show ? 'block' : 'none'; 
+}
+
+// Recent Searches
+function saveRecentSearch(query) {
+  let recent = getFromMemory('recentSearches') || [];
+  recent = recent.filter(q => q !== query);
+  recent.unshift(query);
+  if (recent.length > 5) recent.pop();
+  saveToMemory('recentSearches', recent);
+  renderRecentSearches();
+}
+
+function deleteRecentSearch(query, event) {
+  event.stopPropagation();
+  let recent = getFromMemory('recentSearches') || [];
+  recent = recent.filter(q => q !== query);
+  saveToMemory('recentSearches', recent);
+  renderRecentSearches();
+  showToast('Search removed');
+}
+
+function renderRecentSearches() {
+  let recent = getFromMemory('recentSearches') || [];
+  recentSearchesDiv.innerHTML = '';
+  if (recent.length === 0) return;
+  
+  const title = document.createElement('h3');
+  title.textContent = 'Recent Searches';
+  recentSearchesDiv.appendChild(title);
+  
+  const searchesList = document.createElement('div');
+  searchesList.className = 'searches-list';
+  
+  recent.forEach(query => {
+    const span = document.createElement('span');
+    span.innerHTML = `${query} <span class="delete-search">×</span>`;
+    span.addEventListener('click', () => {
+      searchInput.value = query;
+      search();
+    });
+    span.querySelector('.delete-search').addEventListener('click', (e) => deleteRecentSearch(query, e));
+    searchesList.appendChild(span);
+  });
+  
+  recentSearchesDiv.appendChild(searchesList);
+}
+
 function search() {
   const query = searchInput.value.trim();
-  if (!query) {
-    showMessage('Please enter some ingredients to search.', true);
-    return;
+  if (!query) { 
+    showToast('Please enter some ingredients', true);
+    return; 
   }
   clearMessage();
-  // Redirect to results page with query param
-  window.location.href = `results.html?ingredients=${encodeURIComponent(query)}`;
+  saveRecentSearch(query);
+  showSpinner(true);
+  
+  // Build URL with filters
+  let url = `results.html?ingredients=${encodeURIComponent(query)}`;
+  if (activeFilters.diet) url += `&diet=${activeFilters.diet}`;
+  if (activeFilters.cuisine) url += `&cuisine=${activeFilters.cuisine}`;
+  if (activeFilters.sort) url += `&sort=${activeFilters.sort}`;
+  
+  setTimeout(() => {
+    showSpinner(false);
+    window.location.href = url;
+  }, 500);
 }
 
-// Search on enter key
-searchInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    search();
-  }
+// Search on enter
+searchInput.addEventListener('keydown', e => { 
+  if (e.key === 'Enter') search(); 
 });
+searchBtn.addEventListener('click', search);
+
+// Favorites
+viewFavoritesBtn.addEventListener('click', () => {
+  window.location.href = 'favorites.html';
+});
+
+// Random Recipe
+randomRecipeBtn.addEventListener('click', () => {
+  const randomIngredients = ['chicken', 'pasta', 'beef', 'salmon', 'vegetarian', 'dessert', 'soup'];
+  const random = randomIngredients[Math.floor(Math.random() * randomIngredients.length)];
+  searchInput.value = random;
+  search();
+});
+
+// Debounce for autocomplete (future enhancement)
+let debounceTimer;
+searchInput.addEventListener('input', () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    // Autocomplete logic here
+  }, 300);
+});
+
+// Initialize
+initTheme();
+renderRecentSearches();
 </script>
 </body>
 </html>

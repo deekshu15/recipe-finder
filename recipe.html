@@ -1,259 +1,622 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Recipe Details</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Recipe Details</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
-    /* Background animation */
-    @keyframes backgroundShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+:root {
+  --primary: #43A047;
+  --primary-dark: #2e7d32;
+  --secondary: #FF7043;
+  --secondary-dark: #D84315;
+  --bg-light: #E8F5E9;
+  --bg-cream: #FFF8E1;
+  --text: #333;
+  --white: #fff;
+  --shadow: rgba(224,224,224,0.5);
+}
 
-    body {
-      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #E8F5E9 0%, #FFF8E1 100%);
-      background-size: 200% 200%;
-      animation: backgroundShift 15s ease infinite;
-      margin: 0;
-      padding: 20px;
-      color: #333333;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+[data-theme="dark"] {
+  --bg-light: #1a1a1a;
+  --bg-cream: #2d2d2d;
+  --text: #e0e0e0;
+  --white: #2d2d2d;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
 
-    #container {
-      background: #FFFFFF;
-      border-radius: 20px;
-      max-width: 800px;
-      width: 100%;
-      padding: 30px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 30px;
-      box-sizing: border-box;
-      position: relative;
-      flex-grow: 1;
-    }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-cream) 100%);
+  background-size: 200% 200%;
+  animation: backgroundShift 15s ease infinite;
+  margin: 0;
+  padding: 0 20px 40px;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
 
-    #image {
-      width: 100%;
-      max-width: 360px;
-      border-radius: 16px;
-      object-fit: cover;
-      box-shadow: 0 4px 12px rgba(224, 224, 224, 0.5);
-      transition: transform 0.3s ease;
-      cursor: default;
-    }
-    #image:hover {
-      transform: scale(1.02);
-    }
+@keyframes backgroundShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
-    #info {
-      flex: 1 1 320px;
-      display: flex;
-      flex-direction: column;
-    }
+nav {
+  background: var(--white);
+  padding: 15px 30px;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 1.6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px var(--shadow);
+  margin-bottom: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  transition: background 0.3s;
+}
 
-    #title {
-      margin-top: 0;
-      color: #43A047;
-      font-size: 2rem;
-      user-select: text;
-    }
+.nav-left {
+  cursor: pointer;
+  transition: transform 0.3s, background 0.3s;
+  flex-shrink: 0;
+}
 
-    #author {
-      font-style: italic;
-      margin-bottom: 20px;
-      color: #666666;
-      user-select: text;
-    }
+.favoriteBtn:hover {
+  transform: scale(1.1);
+  background: #ff5722;
+}
 
-    #info p {
-      margin: 8px 0;
-      font-size: 1.1em;
-      color: #333333;
-      user-select: text;
-    }
+.favoriteBtn.inactive {
+  background: #e0e0e0;
+  color: var(--secondary);
+}
 
-    h2 {
-      color: #43A047;
-      margin-top: 20px;
-      margin-bottom: 12px;
-    }
+.recipe-meta {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
 
-    ul {
-      margin-top: 20px;
-      padding-left: 24px;
-      font-size: 1em;
-      color: #333333;
-      line-height: 1.6;
-      user-select: text;
-    }
+.recipe-meta-item {
+  background: var(--bg-light);
+  padding: 10px 15px;
+  border-radius: 10px;
+  font-weight: 600;
+}
 
-    ul li {
-      margin-bottom: 8px;
-      transition: transform 0.2s ease;
-      cursor: default;
-    }
+.recipe-meta-item span {
+  color: var(--primary);
+}
 
-    ul li:hover {
-      transform: translateX(5px);
-      color: #43A047;
-    }
+.recipe-section {
+  margin: 20px 0;
+}
 
-    #messageArea {
-      font-size: 1.1em;
-      color: #333333;
-      margin: 20px 0;
-      user-select: none;
-      text-align: center;
-      width: 100%;
-    }
+.recipe-section h2 {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  color: var(--primary);
+  border-bottom: 2px solid var(--bg-light);
+  padding-bottom: 5px;
+}
 
-    a.back-link {
-      margin-top: 30px;
-      color: #43A047;
-      font-weight: 700;
-      text-decoration: none;
-      font-size: 1.1em;
-      align-self: flex-start;
-      border: 2px solid #43A047;
-      padding: 10px 24px;
-      border-radius: 30px;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(67, 160, 71, 0.3);
-      display: inline-block;
-      user-select: none;
-    }
-    a.back-link:hover, a.back-link:focus-visible {
-      background: #FF7043;
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(255, 112, 67, 0.5);
-      outline: none;
-    }
-    a.back-link:focus-visible {
-      outline: 3px solid #43A047;
-      outline-offset: 2px;
-    }
+.recipe-section ul {
+  padding-left: 20px;
+}
 
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 0.9em;
-      margin-top: auto;
-      background: #43A047;
-      user-select: none;
-      width: 100%;
-    }
+.recipe-section li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
 
-    @media (max-width: 480px) {
-      #container {
-        flex-direction: column;
-        padding: 20px;
-      }
-      #image {
-        max-width: 100%;
-        height: auto;
-      }
-      #info {
-        flex: none;
-      }
-    }
-  </style>
+.recipe-section p {
+  line-height: 1.8;
+}
+
+.instructions-list {
+  counter-reset: step-counter;
+  list-style: none;
+  padding-left: 0;
+}
+
+.instructions-list li {
+  counter-increment: step-counter;
+  margin-bottom: 15px;
+  padding-left: 40px;
+  position: relative;
+}
+
+.instructions-list li::before {
+  content: counter(step-counter);
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: var(--primary);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.user-notes {
+  background: var(--bg-light);
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 20px;
+}
+
+.user-notes textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  background: var(--white);
+  color: var(--text);
+}
+
+.user-notes button {
+  margin-top: 10px;
+  padding: 8px 20px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.user-notes button:hover {
+  background: var(--primary-dark);
+}
+
+.no-instructions {
+  color: #666;
+  font-style: italic;
+}
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--white);
+  color: var(--text);
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: none;
+  z-index: 2000;
+  animation: slideIn 0.3s ease;
+}
+
+.toast.show {
+  display: block;
+}
+
+.toast.error {
+  background: var(--secondary);
+  color: white;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(400px); }
+  to { transform: translateX(0); }
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.9em;
+  margin-top: auto;
+  background: var(--primary);
+}
+
+#spinner {
+  display: none;
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid var(--primary);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 40px auto;
+}
+
+@keyframes spin { 
+  0% { transform: rotate(0deg); } 
+  100% { transform: rotate(360deg); } 
+}
+
+@media print {
+  nav, .recipe-actions, .user-notes, footer, .favoriteBtn {
+    display: none !important;
+  }
+  
+  body {
+    background: white;
+  }
+  
+  .recipe-details {
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .recipe-title { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 10px; 
+  }
+  .recipe-meta {
+    flex-direction: column;
+    gap: 10px;
+  }
+  #apiKeySection input {
+    width: 100%;
+    max-width: 250px;
+  }
+  .toast {
+    right: 10px;
+    left: 10px;
+    bottom: 10px;
+  }
+  .recipe-actions {
+    flex-direction: column;
+  }
+  .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+</style>
 </head>
 <body>
-  <div id="messageArea" role="status" aria-live="polite"></div>
-  <div id="container" hidden>
-    <img id="image" alt="Recipe image" />
-    <div id="info">
-      <h1 id="title">Loading...</h1>
-      <p id="author"></p>
-      <p><strong>Servings:</strong> <span id="servings"></span></p>
-      <p><strong>Ready in:</strong> <span id="readyIn"></span> mins</p>
-      <h2>Ingredients</h2>
-           <ul id="ingredients"></ul>
-      <a href="results.html" class="back-link" aria-label="Back to results">← Back to Results</a>
-    </div>
+
+<div id="toast" class="toast"></div>
+
+<nav>
+  <div class="nav-left" onclick="window.location.href='index.html'">Recipe Finder</div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="index.html">Search</a>
+    <button onclick="window.location.href='favorites.html'">♥ Favorites</button>
+    <button class="theme-toggle" id="themeToggle">🌙</button>
   </div>
+</nav>
 
-  <footer>© 2025 Interactive Recipe Finder. All rights reserved.</footer>
+<div class="recipe-actions" id="recipeActions" style="display: none;">
+  <button class="action-btn btn-print" id="printBtn">🖨️ Print Recipe</button>
+  <button class="action-btn btn-share" id="shareBtn">📤 Share</button>
+  <button class="action-btn btn-shopping" id="shoppingBtn">🛒 Shopping List</button>
+</div>
 
-  <script>
-    const apiKey = '6fe805f276d844ec856949d159c69875'; 
+<div id="spinner"></div>
+<div id="messageArea"></div>
+<div id="recipeContainer" class="recipe-details"></div>
 
-    const messageArea = document.getElementById('messageArea');
-    const container = document.getElementById('container');
-    const titleElem = document.getElementById('title');
-    const imageElem = document.getElementById('image');
-    const authorElem = document.getElementById('author');
-    const servingsElem = document.getElementById('servings');
-    const readyInElem = document.getElementById('readyIn');
-    const ingredientsList = document.getElementById('ingredients');
+<footer>© 2025 Interactive Recipe Finder. All rights reserved.</footer>
 
-    function getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
+<script>
+const recipeContainer = document.getElementById('recipeContainer');
+const messageArea = document.getElementById('messageArea');
+const spinner = document.getElementById('spinner');
+const themeToggle = document.getElementById('themeToggle');
+const recipeActions = document.getElementById('recipeActions');
+const printBtn = document.getElementById('printBtn');
+const shareBtn = document.getElementById('shareBtn');
+const shoppingBtn = document.getElementById('shoppingBtn');
+const toast = document.getElementById('toast');
+
+let favorites = [];
+const apiKey = '6fe805f276d844ec856949d159c69875'; 
+let currentRecipeId = null;
+let currentRecipe = null;
+let userNotes = {};
+
+function initTheme() {
+  const savedTheme = getFromMemory('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+}
+
+themeToggle.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  saveToMemory('theme', newTheme);
+  themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+});
+
+function saveToMemory(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    console.warn('Storage not available');
+  }
+}
+
+function getFromMemory(key) {
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function showToast(msg, isError = false) {
+  toast.textContent = msg;
+  toast.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+function loadFavorites() {
+  favorites = getFromMemory('favorites') || [];
+}
+
+function saveFavorites() {
+  saveToMemory('favorites', favorites);
+}
+
+function loadUserNotes() {
+  userNotes = getFromMemory('recipe_notes') || {};
+}
+
+function saveUserNotes() {
+  saveToMemory('recipe_notes', userNotes);
+}
+
+function showMessage(msg, isError=false) {
+  messageArea.textContent = msg;
+  messageArea.style.color = isError ? 'var(--secondary)' : 'var(--text)';
+}
+
+function showSpinner(show) {
+  spinner.style.display = show ? 'block' : 'none';
+}
+
+function isFavorited(id) {
+  return favorites.some(r => r.id === id);
+}
+
+function toggleFavorite(recipe, btn) {
+  if (isFavorited(recipe.id)) {
+    favorites = favorites.filter(r => r.id !== recipe.id);
+    btn.classList.add('inactive');
+    btn.title = 'Add to favorites';
+    showToast('Removed from favorites');
+  } else {
+    favorites.push({ 
+      id: recipe.id, 
+      title: recipe.title, 
+      image: recipe.image 
+    });
+    btn.classList.remove('inactive');
+    btn.title = 'Remove from favorites';
+    showToast('Added to favorites');
+  }
+  saveFavorites();
+}
+
+function getQueryParam(name) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
+}
+
+function stripHtml(html) {
+  const tmp = document.createElement('DIV');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+}
+
+async function fetchRecipeDetails(id) {
+
+  showMessage('Loading recipe details...');
+  showSpinner(true);
+  recipeContainer.innerHTML = '';
+  recipeActions.style.display = 'none';
+  
+  try {
+    const url = `https://api.spoonacular.com/recipes/${id}/information?includeNutrition=false&apiKey=${apiKey}`;
+    const res = await fetch(url);
+    
+    if (res.status === 401) {
+      showMessage('Invalid API key. Please check and try again.', true);
+      showSpinner(false);
+      return;
     }
-
-    function showMessage(msg, isError = false) {
-      messageArea.textContent = msg;
-      messageArea.style.color = isError ? '#FF7043' : '#333333';
-      container.hidden = true;
+    
+    if (res.status === 402) {
+      showMessage('API daily limit reached. Try again tomorrow or upgrade your plan.', true);
+      showSpinner(false);
+      return;
     }
-
-    function clearMessage() {
-      messageArea.textContent = '';
-      container.hidden = false;
+    
+    if (res.status === 404) {
+      showMessage('Recipe not found.', true);
+      showSpinner(false);
+      return;
     }
+    
+    if (!res.ok) {
+      throw new Error(`API request failed with status ${res.status}`);
+    }
+    
+    const recipe = await res.json();
+    currentRecipe = recipe;
+    renderRecipe(recipe);
+    showMessage('');
+    showSpinner(false);
+    recipeActions.style.display = 'flex';
+  } catch (err) {
+    console.error('Fetch error:', err);
+    showMessage('Error fetching recipe details. Please try again later.', true);
+    showSpinner(false);
+  }
+}
 
-    async function fetchRecipeDetails(id) {
-      const url = `https://api.spoonacular.com/recipes/${id}/information?apiKey=${apiKey}`;
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('Failed to load recipe details. Please check your API key or try again later.');
-        }
-        return await response.json();
-      } catch (error) {
-        showMessage(error.message, true);
-        return null;
+function renderRecipe(recipe) {
+  const metaItems = [];
+  if (recipe.readyInMinutes) {
+    metaItems.push(`<div class="recipe-meta-item">⏱ <span>${recipe.readyInMinutes} minutes</span></div>`);
+  }
+  if (recipe.servings) {
+    metaItems.push(`<div class="recipe-meta-item">🍽 <span>${recipe.servings} servings</span></div>`);
+  }
+  if (recipe.healthScore) {
+    metaItems.push(`<div class="recipe-meta-item">💚 <span>Health Score: ${recipe.healthScore}</span></div>`);
+  }
+
+  let ingredientsHtml = '<p class="no-instructions">No ingredients available.</p>';
+  if (recipe.extendedIngredients && recipe.extendedIngredients.length > 0) {
+    ingredientsHtml = '<ul>' + 
+      recipe.extendedIngredients.map(ing => `<li>${ing.original}</li>`).join('') + 
+      '</ul>';
+  }
+
+  let instructionsHtml = '<p class="no-instructions">No instructions available.</p>';
+  
+  if (recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0 && 
+      recipe.analyzedInstructions[0].steps && recipe.analyzedInstructions[0].steps.length > 0) {
+    instructionsHtml = '<ol class="instructions-list">' + 
+      recipe.analyzedInstructions[0].steps.map(step => `<li>${step.step}</li>`).join('') + 
+      '</ol>';
+  } else if (recipe.instructions) {
+    const cleanInstructions = stripHtml(recipe.instructions);
+    instructionsHtml = `<p>${cleanInstructions}</p>`;
+  }
+
+  let summaryHtml = '<p class="no-instructions">No summary available.</p>';
+  if (recipe.summary) {
+    const cleanSummary = stripHtml(recipe.summary);
+    summaryHtml = `<p>${cleanSummary}</p>`;
+  }
+
+  const savedNote = userNotes[recipe.id] || '';
+
+  recipeContainer.innerHTML = `
+    <img src="${recipe.image}" alt="${recipe.title}" onerror="this.src='https://via.placeholder.com/900x400?text=No+Image'" />
+    <div class="recipe-title">
+      <span>${recipe.title}</span>
+      <button class="favoriteBtn ${isFavorited(recipe.id) ? '' : 'inactive'}" title="${isFavorited(recipe.id) ? 'Remove from favorites' : 'Add to favorites'}">♥</button>
+    </div>
+    
+    ${metaItems.length > 0 ? `<div class="recipe-meta">${metaItems.join('')}</div>` : ''}
+    
+    <div class="recipe-section">
+      <h2>Summary</h2>
+      ${summaryHtml}
+    </div>
+    
+    <div class="recipe-section">
+      <h2>Ingredients</h2>
+      ${ingredientsHtml}
+    </div>
+    
+    <div class="recipe-section">
+      <h2>Instructions</h2>
+      ${instructionsHtml}
+    </div>
+    
+    <div class="user-notes">
+      <h3>Personal Notes</h3>
+      <textarea id="notesTextarea" placeholder="Add your cooking notes, modifications, or ratings...">${savedNote}</textarea>
+      <button id="saveNotesBtn">Save Notes</button>
+    </div>
+  `;
+
+  const favBtn = recipeContainer.querySelector('.favoriteBtn');
+  favBtn.addEventListener('click', () => toggleFavorite(recipe, favBtn));
+  
+  const saveNotesBtn = document.getElementById('saveNotesBtn');
+  const notesTextarea = document.getElementById('notesTextarea');
+  saveNotesBtn.addEventListener('click', () => {
+    userNotes[recipe.id] = notesTextarea.value;
+    saveUserNotes();
+    showToast('Notes saved successfully');
+  });
+}
+
+printBtn.addEventListener('click', () => {
+  window.print();
+});
+
+shareBtn.addEventListener('click', async () => {
+  if (navigator.share && currentRecipe) {
+    try {
+      await navigator.share({
+        title: currentRecipe.title,
+        text: `Check out this recipe: ${currentRecipe.title}`,
+        url: window.location.href
+      });
+      showToast('Recipe shared successfully');
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        copyToClipboard(window.location.href);
       }
     }
+  } else {
+    copyToClipboard(window.location.href);
+  }
+});
 
-    async function init() {
-      const id = getQueryParam('id');
-      if (!id) {
-        showMessage('No recipe ID specified.', true);
-        return;
-      }
-      showMessage('Loading recipe details...');
-      const detail = await fetchRecipeDetails(id);
-      if (!detail) return;
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Link copied to clipboard');
+  }).catch(() => {
+    showToast('Failed to copy link', true);
+  });
+}
 
-      clearMessage();
+shoppingBtn.addEventListener('click', () => {
+  if (!currentRecipe || !currentRecipe.extendedIngredients) {
+    showToast('No ingredients available', true);
+    return;
+  }
+  
+  const ingredients = currentRecipe.extendedIngredients.map(ing => ing.original).join('\n');
+  const blob = new Blob([`Shopping List for ${currentRecipe.title}\n\n${ingredients}`], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `shopping-list-${currentRecipe.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Shopping list downloaded');
+});
 
-      titleElem.textContent = detail.title;
-      imageElem.src = detail.image;
-      imageElem.alt = detail.title;
-      authorElem.textContent = `Source: ${detail.sourceName || 'Unknown'}`;
-      servingsElem.textContent = detail.servings;
-      readyInElem.textContent = detail.readyInMinutes;
-      ingredientsList.innerHTML = detail.extendedIngredients
-        .map(ing => `<li>${ing.original}</li>`)
-        .join('');
-    }
+initTheme();
+loadFavorites();
+loadUserNotes();
+currentRecipeId = getQueryParam('id');
 
-    init();
-  </script>
+if (currentRecipeId) {
+  fetchRecipeDetails(currentRecipeId);
+} else {
+  showMessage('No recipe ID provided.', true);
+}
+</script>
 </body>
 </html>

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>My Favorite Recipes</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+  --primary: #43A047;
+  --primary-dark: #2e7d32;
+  --secondary: #FF7043;
+  --secondary-dark: #D84315;
+  --bg-light: #E8F5E9;
+  --bg-cream: #FFF8E1;
+  --text: #333;
+  --white: #fff;
+  --shadow: rgba(224,224,224,0.5);
+}
+
+[data-theme="dark"] {
+  --bg-light: #1a1a1a;
+  --bg-cream: #2d2d2d;
+  --text: #e0e0e0;
+  --white: #2d2d2d;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-cream) 100%);
+  background-size: 200% 200%;
+  animation: backgroundShift 15s ease infinite;
+  margin: 0;
+  padding: 0 20px 40px;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+
+@keyframes backgroundShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+nav {
+  background: var(--white);
+  padding: 15px 30px;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 1.6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px var(--shadow);
+  margin-bottom: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  transition: background 0.3s;
+}
+
+.nav-left {
+  cursor: pointer;
+  color: var(--primary);
+}
+
+.nav-links {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--primary);
+  font-weight: 600;
+  transition: color 0.3s;
+  font-size: 1rem;
+}
+
+.nav-links a:hover {
+  color: var(--primary-dark);
+}
+
+.nav-links button {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: none;
+  background-color: var(--secondary);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 0.9rem;
+}
+
+.nav-links button:hover {
+  background-color: var(--secondary-dark);
+}
+
+.theme-toggle {
+  background: var(--primary) !important;
+  font-size: 1.2rem !important;
+  padding: 8px 12px !important;
+}
+
+#topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.top-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#messageArea {
+  font-size: 1.1em;
+  min-height: 24px;
+  color: var(--text);
+}
+
+#clearAllBtn, #exportBtn {
+  padding: 8px 18px;
+  border-radius: 25px;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+}
+
+#clearAllBtn {
+  background-color: #E53935;
+}
+
+#clearAllBtn:hover {
+  background-color: #B71C1C;
+  transform: translateY(-2px);
+}
+
+#exportBtn {
+  background-color: var(--primary);
+}
+
+#exportBtn:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+#searchFavorites {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 2px solid var(--primary);
+  background: var(--white);
+  color: var(--text);
+  font-size: 0.9rem;
+  width: 250px;
+  transition: all 0.3s;
+}
+
+#searchFavorites:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.2);
+}
+
+#favoritesContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+  padding: 10px;
+}
+
+.card {
+  background: var(--white);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px var(--shadow);
+  transition: all 0.3s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(67,160,71,0.3);
+}
+
+.card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.card:hover img {
+  transform: scale(1.05);
+}
+
+.card-body {
+  padding: 12px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.removeBtn {
+  border: none;
+  background: var(--secondary);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: all 0.3s;
+}
+
+.removeBtn:hover {
+  background: var(--secondary-dark);
+  transform: translateY(-2px);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-state h2 {
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  color: var(--text);
+  opacity: 0.7;
+  margin-bottom: 20px;
+}
+
+.empty-state button {
+  padding: 12px 30px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.empty-state button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--white);
+  color: var(--text);
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: none;
+  z-index: 2000;
+  animation: slideIn 0.3s ease;
+}
+
+.toast.show {
+  display: block;
+}
+
+.toast.error {
+  background: var(--secondary);
+  color: white;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(400px); }
+  to { transform: translateX(0); }
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.9em;
+  margin-top: auto;
+  background: var(--primary);
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  #topBar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .top-actions {
+    flex-wrap: wrap;
+  }
+  
+  #searchFavorites {
+    width: 100%;
+  }
+  
+  .toast {
+    right: 10px;
+    left: 10px;
+    bottom: 10px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<nav>
+  <div class="nav-left" onclick="window.location.href='index.html'">Recipe Finder</div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="results.html?ingredients=pasta">Search</a>
+    <button onclick="window.location.href='favorites.html'">♥ My Favorites</button>
+    <button class="theme-toggle" id="themeToggle">🌙</button>
+  </div>
+</nav>
+
+<div id="topBar">
+  <div id="messageArea"></div>
+  <input type="text" id="searchFavorites" placeholder="Search favorites..." />
+  <div class="top-actions">
+    <button id="exportBtn" style="display:none;">📥 Export</button>
+    <button id="clearAllBtn" style="display:none;">Clear All</button>
+  </div>
+</div>
+
+<div id="favoritesContainer"></div>
+
+<footer>© 2025 Interactive Recipe Finder. All rights reserved.</footer>
+
+<script>
+const favoritesContainer = document.getElementById('favoritesContainer');
+const messageArea = document.getElementById('messageArea');
+const clearAllBtn = document.getElementById('clearAllBtn');
+const exportBtn = document.getElementById('exportBtn');
+const searchInput = document.getElementById('searchFavorites');
+const themeToggle = document.getElementById('themeToggle');
+const toast = document.getElementById('toast');
+
+let favorites = [];
+let filteredFavorites = [];
+
+function initTheme() {
+  const savedTheme = getFromMemory('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+}
+
+themeToggle.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  saveToMemory('theme', newTheme);
+  themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+});
+
+function saveToMemory(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    console.warn('Storage not available');
+  }
+}
+
+function getFromMemory(key) {
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function showToast(msg, isError = false) {
+  toast.textContent = msg;
+  toast.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+function loadFavorites() {
+  favorites = getFromMemory('favorites') || [];
+  filteredFavorites = [...favorites];
+}
+
+function saveFavorites() {
+  saveToMemory('favorites', favorites);
+}
+
+function showMessage(msg, isError=false) {
+  messageArea.textContent = msg;
+  messageArea.style.color = isError ? 'var(--secondary)' : 'var(--text)';
+}
+
+function showEmptyState() {
+  favoritesContainer.innerHTML = `
+    <div class="empty-state">
+      <div class="empty-state-icon">♥</div>
+      <h2>No favorites yet!</h2>
+      <p>Start adding recipes from search results to build your collection.</p>
+      <button onclick="window.location.href='index.html'">Start Searching</button>
+    </div>
+  `;
+}
+
+function renderFavorites() {
+  favoritesContainer.innerHTML = '';
+  
+  if (favorites.length === 0) {
+    showEmptyState();
+    clearAllBtn.style.display = 'none';
+    exportBtn.style.display = 'none';
+    searchInput.style.display = 'none';
+    return;
+  }
+  
+  if (filteredFavorites.length === 0) {
+    favoritesContainer.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <h2>No matching favorites</h2>
+        <p>Try a different search term.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  showMessage('');
+  clearAllBtn.style.display = 'inline-block';
+  exportBtn.style.display = 'inline-block';
+  searchInput.style.display = 'block';
+  
+  filteredFavorites.forEach(recipe => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <img src="${recipe.image}" alt="${recipe.title}" loading="lazy"/>
+      <div class="card-body">
+        <h3>${recipe.title}</h3>
+        <button class="removeBtn">Remove</button>
+      </div>
+    `;
+    
+    card.querySelector('img').addEventListener('click', () => {
+      window.location.href = 'recipe.html?id=' + recipe.id;
+    });
+    
+    card.querySelector('h3').addEventListener('click', () => {
+      window.location.href = 'recipe.html?id=' + recipe.id;
+    });
+    
+    card.querySelector('.removeBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      removeRecipe(recipe.id);
+    });
+    
+    favoritesContainer.appendChild(card);
+  });
+}
+
+function removeRecipe(id) {
+  const recipe = favorites.find(r => r.id === id);
+  if (recipe) {
+    favorites = favorites.filter(r => r.id !== id);
+    saveFavorites();
+    loadFavorites();
+    filterFavorites(searchInput.value);
+    showToast(`Removed "${recipe.title}"`);
+  }
+}
+
+function filterFavorites(searchTerm) {
+  if (!searchTerm.trim()) {
+    filteredFavorites = [...favorites];
+  } else {
+    const term = searchTerm.toLowerCase();
+    filteredFavorites = favorites.filter(recipe => 
+      recipe.title.toLowerCase().includes(term)
+    );
+  }
+  renderFavorites();
+}
+
+searchInput.addEventListener('input', (e) => {
+  filterFavorites(e.target.value);
+});
+
+clearAllBtn.addEventListener('click', () => {
+  if (confirm(`Are you sure you want to clear all ${favorites.length} favorites?`)) {
+    favorites = [];
+    filteredFavorites = [];
+    saveFavorites();
+    renderFavorites();
+    showToast('All favorites cleared');
+  }
+});
+
+exportBtn.addEventListener('click', () => {
+  if (favorites.length === 0) return;
+  
+  const data = {
+    exportDate: new Date().toISOString(),
+    totalFavorites: favorites.length,
+    favorites: favorites
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `recipe-favorites-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Favorites exported successfully');
+});
+
+document.addEventListener('dragover', (e) => {
+  e.preventDefault();
+});
+
+document.addEventListener('drop', (e) => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/json') {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (data.favorites && Array.isArray(data.favorites)) {
+          const newFavorites = data.favorites.filter(recipe => 
+            !favorites.some(f => f.id === recipe.id)
+          );
+          favorites = [...favorites, ...newFavorites];
+          saveFavorites();
+          loadFavorites();
+          renderFavorites();
+          showToast(`Imported ${newFavorites.length} new favorites`);
+        }
+      } catch (err) {
+        showToast('Invalid favorites file', true);
+      }
+    };
+    reader.readAsText(file);
+  }
+});
+
+initTheme();
+loadFavorites();
+renderFavorites();
+</script>
+</body>
+</html>
